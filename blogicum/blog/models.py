@@ -68,20 +68,20 @@ class Post(BaseModel):
         on_delete=models.CASCADE,
         null=False,
         verbose_name='Автор публикации'
-        )
+    )
     location = models.ForeignKey(
         Location,
         on_delete=models.SET_NULL,
         null=True,
         verbose_name='Местоположение'
-        )
+    )
     category = models.ForeignKey(
         Category,
         on_delete=models.SET_NULL,
         null=True,
         verbose_name='Категория',
         related_name='posts'
-        )
+    )
     image = models.ImageField('Фото', upload_to='posts_images', blank=True)
 
     class Meta:
