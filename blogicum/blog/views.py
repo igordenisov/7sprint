@@ -9,6 +9,7 @@ from .forms import CommentForm, PostForm, ProfileForm
 from .models import Category, Comment, Post, User
 from django.urls import reverse_lazy
 from django.shortcuts import redirect
+from django.contrib.auth.decorators import login_required
 
 
 class IndexListView(ListView):
@@ -19,7 +20,7 @@ class IndexListView(ListView):
 
     def get_queryset(self):
         queryset = super().get_queryset()
-        queryset = queryset.annotate(comment_count=Count('comment'))
+        queryset = queryset.annotate(comment_count=Count('comments'))
         return queryset.select_related(
             'author', 'location', 'category'
         ).filter(is_published=True, category__is_published=True,
@@ -40,7 +41,7 @@ class PostCreateView(LoginRequiredMixin, CreateView):
         return reverse('blog:profile', kwargs={'username': username})
 
 
-class PostUpdateView(UpdateView):
+class PostUpdateView(LoginRequiredMixin, UpdateView):
     model = Post
     form_class = PostForm
     template_name = 'blog/create.html'
@@ -63,7 +64,7 @@ class PostUpdateView(UpdateView):
         return reverse('blog:profile', kwargs={'username': username})
 
 
-class PostDeleteView(DeleteView):
+class PostDeleteView(LoginRequiredMixin, DeleteView):
     model = Post
     template_name = 'blog/create.html'
 
@@ -94,7 +95,7 @@ class PostDetailView(DetailView):
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
         context['form'] = CommentForm()
-        context['comments'] = self.object.comment.select_related('author')
+        context['comments'] = self.object.comments.select_related('author')
         return context
 
 
@@ -136,7 +137,7 @@ class ProfileListView(ListView):
             queryset = Post.objects.filter(author=self.author)
         else:
             queryset = super().get_queryset().filter(author=self.author)
-        queryset = queryset.annotate(comment_count=Count('comment'))
+        queryset = queryset.annotate(comment_count=Count('comments'))
         return queryset
 
     def get_context_data(self, **kwargs):
@@ -146,7 +147,7 @@ class ProfileListView(ListView):
         return context
 
 
-class ProfileUpdateView(UpdateView):
+class ProfileUpdateView(LoginRequiredMixin, UpdateView):
     model = User
     form_class = ProfileForm
     template_name = 'blog/user.html'
@@ -159,7 +160,7 @@ class ProfileUpdateView(UpdateView):
         return reverse('blog:profile', kwargs={'username': username})
 
 
-class CommentAddView(CreateView):
+class CommentAddView(LoginRequiredMixin, CreateView):
     post_obj = None
     model = Comment
     form_class = CommentForm
@@ -178,7 +179,7 @@ class CommentAddView(CreateView):
         return reverse('blog:post_detail', kwargs={'pk': self.post_obj.pk})
 
 
-class CommentUpdateView(UpdateView):
+class CommentUpdateView(LoginRequiredMixin, UpdateView):
     model = Comment
     form_class = CommentForm
     pk_url_kwarg = "id"
@@ -198,7 +199,7 @@ class CommentUpdateView(UpdateView):
         return reverse("blog:post_detail", kwargs={"pk": pk})
 
 
-class CommentDeleteView(DeleteView):
+class CommentDeleteView(LoginRequiredMixin, DeleteView):
     model = Comment
     pk_url_kwarg = 'id'
     template_name = 'blog/comment.html'

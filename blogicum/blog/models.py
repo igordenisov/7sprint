@@ -27,7 +27,7 @@ class Location(BaseModel):
         verbose_name_plural = 'Местоположения'
 
     def __str__(self):
-        return self.name
+        return self.name[:65]
 
 
 class Category(BaseModel):
@@ -67,13 +67,15 @@ class Post(BaseModel):
         User,
         on_delete=models.CASCADE,
         null=False,
-        verbose_name='Автор публикации'
+        verbose_name='Автор публикации',
+        related_name='author'
     )
     location = models.ForeignKey(
         Location,
         on_delete=models.SET_NULL,
         null=True,
-        verbose_name='Местоположение'
+        verbose_name='Местоположение',
+        related_name='locations'
     )
     category = models.ForeignKey(
         Category,
@@ -98,7 +100,7 @@ class Comment(models.Model):
     post = models.ForeignKey(
         Post,
         on_delete=models.CASCADE,
-        related_name='comment',
+        related_name='comments',
     )
     created_at = models.DateTimeField(auto_now_add=True)
     author = models.ForeignKey(User, on_delete=models.CASCADE)
