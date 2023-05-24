@@ -9,7 +9,6 @@ from .forms import CommentForm, PostForm, ProfileForm
 from .models import Category, Comment, Post, User
 from django.urls import reverse_lazy
 from django.shortcuts import redirect
-from django.contrib.auth.decorators import login_required
 
 
 class IndexListView(ListView):
