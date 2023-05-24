@@ -136,7 +136,8 @@ class ProfileListView(ListView):
             queryset = Post.objects.filter(author=self.author)
         else:
             queryset = super().get_queryset().filter(author=self.author)
-        queryset = queryset.annotate(comment_count=Count('comments')).order_by('-pub_date')
+        queryset = queryset.annotate(comment_count=Count('comments')
+                                     ).order_by('-pub_date')
         return queryset
 
     def get_context_data(self, **kwargs):
